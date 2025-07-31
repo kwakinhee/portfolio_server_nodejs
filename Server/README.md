@@ -1,4 +1,5 @@
-#  Game Server Backend (TypeScript 기반 서버)
+Inhee Game Server 
+# 📡 Game Server Backend (TypeScript 기반 서버)
 
 > **멀티 서버 기반 게임 서버 백엔드** 프로젝트로, 인증부터 월드서버 운영까지 모듈화된 아키텍처를 통해 고성능 실시간 처리를 지원합니다.  
 
@@ -34,22 +35,7 @@
 │   └── worldServer/      # 실제 유저가 접속하는 게임 월드 서버
 ```
 
-## 🗂 서버 아키텍처 구성도 (Mermaid)
 
-```mermaid
-flowchart TD
-    Client -->|REST API| authServer
-    authServer -->|Access| authDB
-    authServer -->|Cache| Redis[(Redis)]
-    authServer -->|REST API| worldServer
-    worldServer -->|Access| userDB
-    authServer -->|PubSub| RedisPubSub
-    worldServer -->|PubSub| RedisPubSub
-    worldServer -->|TCP| worldMgrServer
-    configServer -->|REST API| authServer
-    configServer -->|REST API| worldServer
-    configServer -->|REST API| worldMgrServer
-```
 ## 🗺️ 서버 아키텍처 구성도
 
 ![서버 아키텍처 구성도](../documents/ServerArchitecture.svg)

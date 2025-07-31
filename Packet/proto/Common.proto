@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+// * proto3 에서 enum의 첫번째 value 는 0 이여야 함.
+// * proto3 에서 enum들의 이름이 중복되지 말아야 함.
+// * proto3 에서 모든 필드는 optional. 
+// * proto3 에서 optional를 명시하면 해당 필드에 값을 명시적으로 세팅 하였는지 확인할수 있는 is_set() 비트가 추가된다.
+// * syntax = "proto3"; 이 가장 위에 선언되어야 함.
+
+// Unreal Client <-> WorldServer 연동할 데이터 정의.
+
+message Common
+{
+  // 이동 회전 데이터.
+  message MoveStateEntity
+  {
+    // 언리얼 좌표.
+    float x = 1;
+    float y = 2;
+    float z = 3;
+    
+    float degrees = 4;	// 회전 각도 (yaw).
+    
+    float vx = 5; // 속도.
+    float vy = 6; // 속도.
+    float vz = 7; // 속도.
+    
+    float clientTimeUtc = 8; //  클라이언트에서 보낸 시간(UTC)
+  }
+
+  message UserEntity
+  {
+    optional int32 userId = 1;
+    optional string accountId = 2;
+    optional string pubId = 3;
+    optional string enterWorldToken = 4;
+  }
+
+  message AvaterSlotEntity
+  {
+    int32 avatarSlotId = 1;
+    int32 avatarItemCmsId = 2;
+  }
+
+  message CharacterEntity
+  {
+    optional string name = 1; 
+    optional int32 cmsId = 2; 
+    repeated AvaterSlotEntity avaterSlots = 3;
+  }
+
+  // 유저 데이터 추가/삭제를 위한 싱크 데이터.
+  message SyncEntity
+  {
+    optional UserEntity user = 1;
+    optional CharacterEntity character = 2;
+  }
+}

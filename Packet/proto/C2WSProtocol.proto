@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+import "Common.proto";
+
+message C2WSProtocol
+{
+  enum PacketType {
+    NONE = 0;
+  
+    LoginReq = 1001;
+    MoveReq = 1002;
+    JoinWorldReq = 1003;
+    FullSyncWorldReq = 1004;
+    GetWorldAddressReq = 1005;
+    QuitWorldReq = 1006;
+    GetAvatarSlotsReq = 1007;
+    ChangeAvatarSlotReq = 1008;
+    GetMyProfileReq = 1009;
+    ActionReq = 1010;
+    SetFieldObjectReq = 1011;
+    UpdateFieldObjectReq = 1012;
+    RemoveFieldObjectReq = 1013;
+
+    GetMyBagReq = 1014;
+    EquipReq = 1015;
+    UnequipReq = 1016;
+
+    Ping = 3001;
+    
+    MAX = 32767;
+  }
+  
+  message Message
+  {
+    message LoginReq
+    {
+      bool isDevLogin = 1;
+      string accountId = 2; // 에디터인 경우 pubId
+      string enterWorldToken = 3;
+      string loginPlatform = 4; // ex) 구글, 페이스북
+    }
+  
+    message Ping
+    {
+      optional bool serverTimeUtcRequest = 1;			
+      optional int64 clientTimeUtc = 2;
+      optional string stressMessage = 3;
+    }
+  
+    message MoveReq
+    {
+      int32 userId = 1;
+      Common.MoveStateEntity moveState = 2;
+    }
+  
+    message JoinWorldReq
+    {
+      int32 userId = 1;
+      int32 worldId = 2;
+    }
+  
+    message FullSyncWorldReq
+    {
+      int32 userId = 1;
+      int32 worldId = 2;
+    }
+  
+    message QuitWorldReq
+    {
+      int32 userId = 1;
+    }
+  
+    message GetWorldAddressReq
+    {
+      int32 userId = 1;
+      int32 worldId = 2;
+    }
+  
+  
+    message AvatarSlotReq
+    {
+      int32 userId = 1;
+      int32 characterCmsId = 2;
+    }
+  
+    message ChangeAvatarSlotReq
+    {
+      int32 userId = 1;
+      int32 characterCmsId = 2;
+      repeated Common.AvaterSlotEntity avaterSlots = 3;
+    }
+  
+    message MyProfileReq
+    {
+      int32 UserId = 1;
+    }
+  
+    message ActionReq
+    {
+      int32 userId = 1;
+      bytes byte_arr_message = 2;
+    }
+  
+    message PlaceObject
+    {
+      int32 userId = 1;
+      int32 itemCmsId = 2;
+    }
+  
+    message RetrieveObject
+    {
+      int32 userId = 1;
+      int32 objectCmsId = 2;
+    }
+  
+    message PickupItemReq
+    {
+      int32 userId = 1;
+      int32 objectCmsId = 2;
+    }
+  
+    message ThowAwayItemReq
+    {
+      int32 userId = 1;
+      int32 itemCmsId = 2;
+    }
+  
+    message SetFieldObjectReq
+    {
+      int32 itemDbId = 1;
+      int32 itemCmsId = 2;
+      int32 posX = 3;
+      int32 posY = 4;
+      int32 layer = 5;
+      int32 dir = 6;
+    }
+  
+    message UpdateFieldObjectReq
+    {
+      int32 objectDbId = 1;
+      int32 posX = 2;
+      int32 posY = 3;
+      int32 layer = 4;
+      int32 dir = 5;
+    }
+  
+    message RemoveFieldObjectReq
+    {
+      int32 objectDbId = 1;
+    }
+  }
+}

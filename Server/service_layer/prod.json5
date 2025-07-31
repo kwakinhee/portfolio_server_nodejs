@@ -1,0 +1,251 @@
+{
+  // ----------------------------------------------------
+  // 하나의 service_layer 환경 에서 동일한 설정.
+  // ----------------------------------------------------
+
+  sharedConfig: {
+    // 본 서비스군 공용으로 사용되는 rest API service 목록.
+    http: {
+      authServer: {
+        // 인증
+        url: "http://localhost:10302",
+      },
+    },
+
+    // 인증 DB 설정 (AuthServer 사용)
+    // 변경 시 migrateRdb.ts 같이 수정해주어야 됨
+    mysqlAuthDb: {
+      host: "3.34.187.193",
+      port: 3306,
+      user: "inheedev_test",
+      password: "inheedev123$",
+      database: "inheeauth",
+      multipleStatements: true,
+      supportBigNumbers: true,
+      bigNumberStrings: false,
+      connectTimeout: 3000,
+      flags: "-FOUND_ROWS",
+      driver: "mysql",
+    },
+
+    // 변경 시 migrateRdb.ts 같이 수정해주어야 됨
+    mysqlUserDb: {
+      host: "3.34.187.193",
+      port: 3306,
+      user: "inheedev_test",
+      password: "inheedev123$",
+      database: "inheeuser_00",
+      multipleStatements: true,
+      supportBigNumbers: true,
+      bigNumberStrings: false,
+      connectTimeout: 3000,
+      flags: "-FOUND_ROWS",
+      driver: "mysql",
+    },
+
+    // 인증/중복 로그인 방지용 pubsub redis (authServer, worldServer 사용)
+    authPubsubRedis: {
+      host: "localhost",
+      port: 6379,
+    },
+
+    // 유저 캐시 Redis 정보(authServer, worldServer 사용)
+    userCacheRedis: {
+      redisCfg: {
+        host: "localhost",
+        port: 6379,
+        db: 1,
+      },
+      pool: {
+        min: 1,
+        max: 4,
+      },
+      scriptDir: "userCache",
+    },
+
+    userHeartBeatIntervalSec: 5, //유저의 heart beat 주기(sec)
+
+    // 월드 진입 인증 토큰이 자동으로 만료되는 시간.
+    enterWorldTokenExpireSec: 900, // 900 seconds
+  },
+
+  // ----------------------------------------------------
+  // serverGroup 목록 + 설정.
+  // ----------------------------------------------------
+
+  serverGroup: {
+    serverGroups: [
+      {
+        // 서버 그룹 ID
+        id: "MOON-01",
+      },
+
+      // 모든서버에서 필요한 공통 모듈들을 정의.
+    ],
+  },
+
+  // ----------------------------------------------------
+  // configServer service configurations
+  // ----------------------------------------------------
+  configServer: {},
+
+  // ----------------------------------------------------
+  // authServer service configurations
+  // ----------------------------------------------------
+
+  authServer: {
+    // authServer 공용 설정.
+    common: {
+      // 패킷 부하 최대 사이즈.
+      maxPayloadQueueSize: 10,
+
+      // ping 타임아웃 설정
+      ping: {
+        // 핑 주기
+        interval: 2000, // 2 seconds
+
+        // 타임아웃
+        timeout: 10000, // 10 seconds
+      },
+
+      // 클라이언트 틱 설정
+      userTick: {
+        // 틱 주기
+        interval: 1000, // 1 second
+
+        // 서버의 틱 수행시간이 길 경우, 경고를 로깅하는 기준.
+        warningElapsedTime: 100, // 100 milliseconds
+
+        // ping 체크 주기.
+        pingPongIntervalSec: 5, // 5 seconds
+      },
+    }, //common
+
+    // 인스턴스 별 설정.
+    instances: {
+      "authServer.0@__HOSTNAME__": {
+        // 서버 그룹 ID.
+        serverGroupId: "MOON-01",
+
+        // TCP socket listener.
+        publicSocketServer: {
+          bindaddress: "3.34.187.193",
+          port: 10301,
+          url: "http://0.0.0.0:10301",
+        },
+
+        // Rest API 서버. (HTTP)
+        publicRestApiServer: {
+          bindAddress: "0.0.0.0",
+          port: 10300,
+          url: "http://__HOSTNAME__:10300",
+
+          // jwt 인증 비밀키.
+          jwtSecret: "@GiantStep",
+
+          // jwt 인증 만료 기간.
+          jwtExpiresIn: "24h",
+        },
+
+        // 타 서버들 요청 처리.
+        privateRestApiServer: {
+          bindAddress: "0.0.0.0",
+          port: 10302,
+        },
+      },
+    }, // instances
+  }, // authServer
+
+  worldServer: {
+    // worldServer 공용 설정.
+    common: {
+      // 패킷 부하 최대 사이즈.
+      maxPayloadQueueSize: 10,
+
+      // ping 타임아웃 설정
+      ping: {
+        // 핑 주기
+        interval: 2000, // 2 seconds
+
+        // 타임아웃
+        timeout: 10000, // 10 seconds
+      },
+
+      // 클라이언트 틱 설정
+      userTick: {
+        // 틱 주기
+        interval: 1000, // 1 second
+
+        // 서버의 틱 수행시간이 길 경우, 경고를 로깅하는 기준.
+        warningElapsedTime: 100, // 100 milliseconds
+
+        // ping 체크 주기.
+        pingPongIntervalSec: 5, // 5 seconds
+
+        // enter world token 갱신 주기
+        enterWorldTokenRefreshmentIntervalSec: 300, // 300 seconds
+      },
+    }, //common
+
+    // 인스턴스 별 설정.
+    instances: {
+      "worldServer.0@__HOSTNAME__": {
+        // 서버 그룹 ID.
+        serverGroupId: "MOON-01",
+
+        // Rest API 서비스. (HTTP)
+        publicRestApiServer: {
+          bindAddress: "0.0.0.0",
+          port: 10500,
+          url: "http://__HOSTNAME__:10500",
+        },
+
+        // TCP socket listener.
+        publicSocketServer: {
+          bindaddress: "3.34.187.193",
+          port: 10600,
+          url: "http://0.0.0.0:10600",
+        },
+      },
+    }, // instances
+  }, // worldServer
+
+  worldMgrServer: {
+    // worldMgrServer 공용 설정.
+    common: {
+      // 패킷 부하 최대 사이즈.
+      maxPayloadQueueSize: 10,
+
+      // ping 타임아웃 설정
+      ping: {
+        // 핑 주기
+        interval: 2000, // 2 seconds
+
+        // 타임아웃
+        timeout: 10000, // 10 seconds
+      },
+    }, //common
+
+    // 인스턴스 별 설정.
+    instances: {
+      "worldMgrServer.0@__HOSTNAME__": {
+        // 서버 그룹 ID.
+        serverGroupId: "MOON-01",
+
+        // Rest API 서비스. (HTTP)
+        privateRestApiServer: {
+          bindAddress: "0.0.0.0",
+          port: 10700,
+          url: "http://__HOSTNAME__:10700",
+        },
+
+        // TCP socket listener.
+        privateSocketServer: {
+          bindaddress: "0.0.0.0",
+          port: 10800,
+          url: "http://__HOSTNAME__:10800",
+        },
+      },
+    }, // instances
+  }, // worldMgrServer
+}

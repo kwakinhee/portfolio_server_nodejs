@@ -1,0 +1,11 @@
+node_modules
+log
+dist
+.vscode
+
+yarn-error.log
+p4config.txt
+
+yarn.lock
+package.lock
+

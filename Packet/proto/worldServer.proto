@@ -1,0 +1,584 @@
+syntax = "proto3";
+
+package GIANTSTEP.WS.Protocol;
+import "worldServerSync.proto";
+
+// BUILD_PROTO_VERSION 은 proto 파일 변경사항이 있을시 꼭 수정해야함.
+// BUILD_PROTO_VERSION = 0.001;
+
+// ProtoBuf 파일 PacketType 또는 MessageType 추가시 서버쪽 worldserver 경로의 packetHandler 파일의 .index , protocol파일의 packetSerder.ts 확인필요! 
+// PacketType 네이밍 규칙 반드시 지키기 (Prefix 통일, 메시지 이름과 반드시 동일하게)
+// 여러 proto에서 공통적으로 쓰는 구조체는 common.proto로 별도 정의하기
+// 타입명은 여러 proto에서 서로 겹치지 않도록 (겹치는 경우 common에 작성하는 것 고려)
+// byte 웬만하면 쓰지 말고 string으로 사용
+// required 정의 하면 안됨
+
+// * proto3 에서 enum의 첫번째 value 는 0 이여야 함.
+// * proto3 에서 enum들의 이름이 중복되지 말아야 함.
+// * proto3 에서 모든 필드는 optional. 
+// * proto3 에서 optional를 명시하면 해당 필드에 값을 명시적으로 세팅 하였는지 확인할수 있는 is_set() 비트가 추가된다.
+// * syntax = "proto3"; 이 가장 위에 선언되어야 함.
+
+
+// 패킷 Proto 구조 정의.
+
+// user -> server Request 인경우.
+// 응답이 필요한 요청 CQ.
+// 응답이 필요하지 않은 통지 CN.
+
+// server -> user Response 인경우.
+// 응답이 필요한 요청 CQ 에 대한 응답 SA.
+// 응답이 필요하지 않은 통지 SN.
+
+// server <-> user  패킷 Protocol 정의.
+enum PacketType {
+	WS_NONE_PACKET = 0;
+
+	WS_CQ_Login = 101;
+	WS_CQ_Move = 103;
+	WS_CQ_JoinWorld = 104;
+	WS_CQ_FullSyncWorld = 105;
+	WS_CQ_GetWorldAddress = 106;
+	WS_CQ_QuitWorld = 107;
+	WS_CQ_GetAvatarSlots = 108;
+	WS_CQ_ChangeAvatarSlots = 109;
+	WS_CQ_GetMyProfile = 110;
+	WS_CQ_Action = 112;
+	WS_CQ_SetFieldObject = 113;
+	WS_CQ_UpdateFieldObject = 114;
+	WS_CQ_RemoveFieldObject = 115;
+	
+	WS_CQ_GetMyWorldInventory = 116;
+	WS_CQ_GetMyEquipments = 117;
+	WS_CQ_EquipItem = 118;
+	WS_CQ_UnequipItem = 119;
+
+  WS_CQ_DropItemObject = 120;
+  WS_CQ_TakeItemObject = 121;
+
+	WS_CQ_GetMyAvatarInventory = 122;
+	
+	WS_CQ_GetWorldInfoTemp = 123;
+
+	WS_CQ_SyncAvatar = 124;
+
+	WS_SA_Login = 1006;
+	WS_SN_Kick = 1007;
+	WS_SA_Move = 1008;
+	WS_SN_Logout = 1009;
+	WS_SN_Notice_Message = 1011;
+
+	WS_SA_JoinWorld = 1013;
+	WS_SN_UserJoinBroadcast = 1014;
+	WS_SA_FullSyncWorld = 1015;
+	WS_SA_GetWorldAddress = 1016;
+	WS_SN_UserLeaveBroadcast = 1017;
+	WS_SA_GetAvatarSlots = 1018;
+	WS_SA_ChangeAvatarSlots = 1019;
+	WS_SA_GetMyProfile = 1020;
+	WS_SA_Action = 1021;
+	WS_SA_WorldInfo = 1022;
+	WS_SA_FieldObjectList = 1023;
+	WS_SA_SetFieldObject = 1024;
+	WS_SA_UpdateFieldObject = 1025;
+	WS_SA_RemoveFieldObject = 1026;
+
+	WS_SA_GetMyWorldInventory = 1027;
+	WS_SA_GetMyEquipments = 1028;
+
+	WS_SA_EquipItem = 1029;
+	WS_SA_UnequipItem = 1030;
+
+	WS_SN_EquipSlotUpdateBroadcast = 1031;
+
+	WS_SN_DropItemObject = 1032;
+  WS_SN_TakeItemObject = 1033;
+  WS_SA_DropItemObject = 1034;
+  WS_SA_TakeItemObject = 1035;
+
+	WS_SA_GetMyAvatarInventory = 1036;
+
+  WS_SN_SetFieldObject = 1037;
+  WS_SN_UpdateFieldObject = 1038;
+  WS_SN_RemoveFieldObject = 1039;
+
+  WS_SA_GetWorldInfoTemp = 1040;
+
+	WS_SN_SyncAvatar = 1041;
+
+	WS_CQ_Ping = 30000;
+	WS_SA_Pong = 30001;
+	WS_ServerError = 30002;
+	WS_SN_RefreshEnterWorldToken = 30003;
+
+	WS_MAX_PACKET = 32767;
+}
+
+enum EDegree
+{
+  DEGREE_0 = 0;
+  DEGREE_45 = 1;
+  DEGREE_90 = 2;
+  DEGREE_135 = 3;
+  DEGREE_180 = 4;
+  DEGREE_225 = 5;
+  DEGREE_270 = 6;
+  DEGREE_315 = 7;
+  MAX = 8;
+}
+
+
+enum NOTICE_MESSAGE_TYPE
+{
+	GENERAL = 0;
+	URGENT = 1;
+	WARNING = 2;
+}
+
+// Client -> Server Request
+message CQ_Login
+{
+	bool isDevLogin = 1;
+	string accountId = 2; // 에디터인 경우 pubId
+	string enterWorldToken = 3;
+	string loginPlatform = 4; // ex) 구글, 페이스북
+}
+
+message CQ_Ping
+{
+	optional bool serverTimeUtcRequest = 1;			
+	optional int64 clientTimeUtc = 2;
+	optional string stressMessage = 3;
+}
+
+message CQ_Move
+{
+	int32 userId = 1;
+	MoveState moveState = 2;
+}
+
+message CQ_JoinWorld
+{
+	int32 userId = 1;
+	int32 worldId = 2;
+}
+
+message CQ_FullSyncWorld
+{
+	int32 userId = 1;
+	int32 worldId = 2;
+}
+
+message CQ_QuitWorld
+{
+	int32 userId = 1;
+}
+
+message CQ_GetWorldAddress
+{
+	int32 userId = 1;
+	int32 worldId = 2;
+}
+
+message CQ_SyncAvatar
+{
+	int32 userId = 1;
+}
+
+
+message CQ_GetAvatarSlots
+{
+	int32 userId = 1;
+	int32 characterCmsId = 2;
+}
+
+message CQ_ChangeAvatarSlots
+{
+	int32 userId = 1;
+	int32 characterCmsId = 2;
+	repeated AvatarSlot avatarSlots = 3;
+}
+
+message CQ_GetMyProfile
+{
+	int32 userId = 1;
+}
+
+message CQ_Action
+{
+	int32 userId = 1;
+	bytes byte_arr_message = 2;
+}
+
+message CQ_SetFieldObject
+{
+  int32 itemDbId = 1;
+  int32 itemCmsId = 2;
+  int32 posX = 3;
+  int32 posY = 4;
+  int32 layer = 5;
+  EDegree dir = 6;
+}
+
+message CQ_UpdateFieldObject
+{
+  int32 objectDbId = 1;
+  int32 posX = 2;
+  int32 posY = 3;
+  int32 layer = 4;
+  EDegree dir = 5;
+}
+
+message CQ_RemoveFieldObject
+{
+  int32 objectDbId = 1;
+  bool isEditorMode = 2;
+}
+
+message CQ_GetMyWorldInventory
+{
+	int32 userId = 1;
+}
+
+message CQ_GetMyAvatarInventory
+{
+	int32 userId = 1;
+}
+
+message CQ_GetMyEquipments
+{
+	int32 userId = 1;
+}
+
+message CQ_EquipItem
+{
+	int32 itemDbGuid = 1;
+}
+
+message CQ_UnequipItem
+{
+	int32 itemDbGuid = 1;
+}
+
+// 아이템 버리기 요청 (좌표는 클라에서 버릴수 있는 위치를 계산해서 보냄)
+message CQ_DropItemObject
+{
+  int32 itemDbGuid = 1;
+  int32 itemAmount = 2;
+  int32 posX = 3;
+  int32 posY = 4;
+  int32 layer = 5;
+}
+
+// 아이템 줍기 요청 (서버에서 보낸 땅에 떨어진 아이템 리스트에서 itemDbGuid로 요청)
+message CQ_TakeItemObject
+{
+  int32 itemDbGuid = 1;
+}
+
+// Server -> Client Response
+message SA_Login
+{
+	bool result = 1;
+	int64 loginTimeUtc = 2;
+	int32 userCount = 3; // 유저 동접.
+	User user = 4;
+	Character character = 5;
+}
+
+message SN_Kick
+{
+	int32 kickType = 1;
+}
+
+message SA_Move
+{
+	int32 userId = 1;
+	MoveState moveState = 2;
+}
+
+message SN_Logout
+{
+	int32 userId = 1;  // 로그 아웃된 userId.
+	int32 userCount = 2; // 유저 동접.
+}
+
+message SA_Pong
+{
+	optional int64 serverTimeUtc = 1;
+	optional string stressMessage = 2;
+}
+
+message SA_GetWorldAddress
+{
+	bool result = 1;
+	string serverAddress = 2;
+	int32 worldId = 3;
+}
+
+
+message SN_Notice_Message
+{
+	NOTICE_MESSAGE_TYPE messagetype = 1;
+	string content = 2;
+}
+
+message SA_JoinWorld
+{
+	bool result = 1;
+	int32 userId = 2;
+	int32 worldId = 3;
+}
+
+message SA_FullSyncWorld
+{
+	int32 worldId = 1;
+	int32 time = 2;
+	repeated UserData worldUserList = 3;
+	repeated NetworkEntity NetworkEntityList = 4;
+}
+
+message SA_Action
+{
+	int32 userId = 1;
+	bytes byte_arr_message = 2;
+}
+
+message UserData
+{
+	int32 userId = 1;
+	Character character = 2;
+}
+
+message NetworkEntity
+{
+	int32 objectId = 1;
+}
+
+// 룸 조인시 유저 동기화
+message SN_UserJoinBroadcast
+{
+	int32 userId = 1;
+	Character character = 2;
+}
+
+message SN_UserLeaveBroadcast
+{
+	string CharacterName = 1;
+	int32 userId = 2;
+}
+
+message SA_GetAvatarSlots
+{
+	repeated AvatarSlot avatarSlots = 1;
+}
+
+message SN_SyncAvatar
+{
+	int32 userId = 1;
+	optional int32 characterCmsId = 2;
+	repeated AvatarSlot avatarSlots = 3;
+}
+
+
+message SA_ChangeAvatarSlots
+{
+	bool result = 1;
+}
+
+message SA_GetMyProfile
+{
+	int32 userId = 1;
+	string accountId = 2;
+	int32 isAdmin = 3;
+	int32 characterCmsId = 4;
+}
+
+message ServerError
+{
+	int32 errCode = 1;
+	optional string errMessage = 2;
+	PacketType failedCQPacket = 3;
+}
+
+
+message SN_RefreshEnterWorldToken
+{
+	string enterWorldToken = 1;
+}
+
+message TileEntity
+{
+  int32 objectCmsId = 1;
+  int32 posX = 2;
+  int32 posY = 3;
+  int32 layer = 4;
+}
+
+message FieldObjectEntity
+{
+  int32 objectDbId = 1;
+  int32 objectCmsId = 2;
+  int32 posX = 3;
+  int32 posY = 4;
+  int32 layer = 5;
+  EDegree dir = 6;
+}
+
+message SA_WorldInfo
+{
+  int32 worldDbId = 1;
+  repeated TileEntity tileList = 2;
+  repeated FieldObjectEntity fieldObjectList = 3;
+  repeated ItemObjectEntity itemObjectList = 4;
+}
+
+message SA_FieldObjectList
+{
+  repeated FieldObjectEntity fieldObjectList = 1;
+}
+
+message SA_SetFieldObject
+{
+  int32 errorCode = 1;
+  FieldObjectEntity objectData = 2;
+	WorldItem setObjectItem = 3;
+}
+
+message SA_UpdateFieldObject
+{
+  int32 errorCode = 1;
+  FieldObjectEntity objectData = 2;
+}
+
+message SA_RemoveFieldObject
+{
+  int32 errorCode = 1;
+  int32 objectId = 2;
+  bool isEditorMode = 3;
+	WorldItem removedObjectItem = 4;
+}
+
+message SN_SetFieldObject
+{
+  int32 errorCode = 1;
+  int32 userId = 2;
+  FieldObjectEntity objectData = 3;
+}
+
+message SN_UpdateFieldObject
+{
+  int32 errorCode = 1;
+  int32 userId = 2;
+  FieldObjectEntity objectData = 3;
+}
+
+message SN_RemoveFieldObject
+{
+  int32 errorCode = 1;
+  int32 userId = 2;
+  int32 objectId = 3;
+  bool isEditorMode = 4;
+}
+
+message SA_GetMyWorldInventory
+{
+	int32 errorCode = 1; //required
+	int32 capacity = 2; //required
+	repeated WorldItem itemList = 3; //required
+}
+
+message SA_GetMyAvatarInventory
+{
+	int32 errorCode = 1; //required
+	int32 capacity = 2; //required
+	repeated AvatarItem itemList = 3; //required
+}
+
+
+message SA_GetMyEquipments
+{
+	int32 errorCode = 1;
+	repeated EquipmentSlot equipmentSlotList = 2; // can be empty
+}
+
+message SA_EquipItem
+{
+	int32 errorCode = 1;
+	int64 EquippedItemDbGuid = 2; // required
+	int64 UnequippedItemDbGuid = 3; // required: 장착해제 하지 않았을 경우 0
+}
+
+message SA_UnequipItem
+{
+	int32 errorCode = 1;
+	int64 UnequippedItemDbGuid = 2; //required
+}
+
+message SN_EquipSlotUpdateBroadcast
+{
+	int32 userId = 1;
+	repeated EquipmentSlot equipmentSlotList = 2; //required
+}
+
+message ItemObjectEntity
+{
+  int32 itemObjectGuid = 1;
+  int32 itemCmsId = 2;
+  int32 itemAmount = 3;
+  int32 posX = 4;
+  int32 posY = 5;
+  int32 layer = 6;
+}
+
+// 접속 시 알려주는 땅에 버려진 아이템 리스트
+message SN_ItemObjectList
+{
+  repeated ItemObjectEntity itemObjectList = 1;
+}
+
+// 땅에 버려진 아이템 정보 (버려졌을 때)
+message SN_DropItemObject
+{
+  int32 userId = 1;
+  ItemObjectEntity itemObject = 2;
+}
+
+// 주운 아이템 정보 (아이템 주울 때 주변에 broadcasting)
+message SN_TakeItemObject
+{
+  int32 takenItemObjectGuid = 1;
+  int32 userId = 2;
+}
+
+// 아이템 버리기 응답
+message SA_DropItemObject
+{
+  int32 errorCode = 1;
+	WorldItem droppedItem = 2;
+}
+
+// 아이템 줍기 응답
+message SA_TakeItemObject
+{
+  int32 errorCode = 1;
+	WorldItem takenItem = 2;
+}
+
+message CQ_GetWorldInfoTemp
+{
+	int32 worldDbId = 1;
+}
+
+message SA_GetWorldInfoTemp
+{
+	int32 errorCode = 1;
+	int32 worldDbId = 2;
+
+	// 필드오브젝트 정보
+  repeated FieldObjectEntity fieldObjectList = 4;
+  repeated ItemObjectEntity itemObjectList = 5;
+
+	// 월드 내 유저 정보
+	repeated UserData worldUserList = 6;
+}

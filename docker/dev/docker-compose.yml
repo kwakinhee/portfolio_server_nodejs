@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  redis:
+    build: redis
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: always
+  mysql:
+    build: mysql
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "inheedev123$"
+      MYSQL_USER: inheedev_test
+      MYSQL_PASSWORD: "inheedev123$"
+    restart: always
+
+volumes:
+  redis_data:
+  mysql_data:

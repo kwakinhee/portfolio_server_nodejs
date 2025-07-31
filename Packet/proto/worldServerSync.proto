@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+package GIANTSTEP.WS.Protocol;
+
+// * proto3 에서 enum의 첫번째 value 는 0 이여야 함.
+// * proto3 에서 enum들의 이름이 중복되지 말아야 함.
+// * proto3 에서 모든 필드는 optional. 
+// * proto3 에서 optional를 명시하면 해당 필드에 값을 명시적으로 세팅 하였는지 확인할수 있는 is_set() 비트가 추가된다.
+// * syntax = "proto3"; 이 가장 위에 선언되어야 함.
+
+// Unreal Client <-> WorldServer 연동할 데이터 정의.
+
+// 이동 회전 데이터.
+message MoveState
+{
+	// 언리얼 좌표.
+	float x = 1;
+	float y = 2;
+	float z = 3;
+	
+	float degrees = 4;	// 회전 각도 (yaw).
+	
+	float vx = 5; // 속도.
+	float vy = 6; // 속도.
+	float vz = 7; // 속도.
+
+	float clientTimeUtc = 8; //  클라이언트에서 보낸 시간(UTC)
+
+	float axisSize = 9; // 조이스틱 움직임 크기.
+}
+
+message User
+{
+	optional int32 userId = 1;
+	optional string accountId = 2;
+	optional string pubId = 3;
+	optional string enterWorldToken = 4;
+}
+
+message AvatarSlot
+{
+	int32 avatarSlotId = 1;
+	int32 avatarItemCmsId = 2;
+	int32 itemDbGuid = 3;
+	int32 colorIndex = 4;
+}
+
+message Character
+{
+	optional string name = 1; 
+	optional int32 cmsId = 2;
+	repeated AvatarSlot avatarSlots = 3;
+	repeated EquipmentSlot equipmentSlots = 4;
+}
+
+message ToolAttributes
+{
+	int32 durability = 1;
+}
+
+message VegetationAttributes
+{
+	int32 durability = 1;
+}
+
+message ItemEntity
+{
+	int64 itemDbGuid = 1;  //required
+	int32 itemCmsId = 2;    //required
+	int32 count = 3;        //required
+}
+
+message WorldItem
+{
+	ItemEntity item = 1;
+
+	ToolAttributes toolAttr = 2;                //optional! 개별속성이 존재할 시 CMSTable에서 어떤 개별속성을 가져와야하는지 미리 정의.
+	VegetationAttributes vegetationAttr = 3;    //optional! 개별속성이 존재할 시 CMSTable에서 어떤 개별속성을 가져와야하는지 미리 정의.
+}
+
+message AvatarItem
+{
+	ItemEntity item = 1;
+}
+
+
+message EquipmentSlot
+{
+	// 추가 정보가 들어갈 수 있으므로 메세지로 분리
+	int32 itemCmsId = 1; //required
+	int32 itemDbGuid = 2; // optional : 본인의 데이터를 받을때만 유효한 필드.
+}
+
+// 유저 데이터 변경을 위한 싱크 데이터.
+message AddSync
+{
+	optional User user = 1;
+	optional Character character = 2;
+}
+
+// 유저 데이터 삭제를 위한 싱크 데이터.
+message RemoveSync
+{
+	optional User user = 1;
+	optional Character character = 2;
+}

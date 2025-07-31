@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+message AS2CProtocol
+{
+  enum PacketType {
+    NONE = 0;
+  
+    LoginRes = 1001;
+    GetWorldServerAddressRes = 1002;
+  
+    KickNoti = 1003;
+    LogoutNoti = 1004;
+  
+    Pong = 3001;
+    ServerErrorNoti = 3002;
+    
+    MAX = 32767;
+  }
+
+  message Message
+  {
+    // 클라이언트 kick 종류
+    enum EKickType
+    {
+      NAVER_CONTROLLER_KICK = 0;
+    }
+  
+    // Server -> Client Response
+    message LoginRes
+    {
+      bool result = 1;
+      int64 loginTimeUtc = 2;
+      string enterWorldToken = 3;
+      int32 isAdmin = 4;
+      bool isNewUser = 5;
+    }
+  
+    message GetWorldServerAddressRes
+    {
+      bool result = 1;
+      string serverAddress = 2;
+    }
+  
+    message KickNoti
+    {
+      EKickType kickType = 1;
+    }
+  
+  
+    message LogoutNoti
+    {
+      int32 userId = 1;  // 로그 아웃된 userId.
+      int32 userCount = 2; // 유저 동접.
+    }
+  
+    message Pong
+    {
+      optional int64 serverTimeUtc = 1;
+      optional string stressMessage = 2;
+    }
+  }
+}

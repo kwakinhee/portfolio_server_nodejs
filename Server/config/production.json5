@@ -1,0 +1,31 @@
+// prod 환경
+{
+  // 기본 로깅 설정
+  log: {
+    // 콘솔 출력
+    console: {
+      level: "info",
+      inspectDepth: 7,
+    },
+
+    // 파일 출력
+    file: {
+      level: "info",
+      // 로그파일 Rotation 설정.
+      datePattern: "YYYY-MM-DD.HH",
+      datePatternDaily: "YYYY-MM-DD",
+    },
+
+    // 로그 폴더 위치.
+    // 이 위치 밑에 각종 로그 폴더/파일들이 생성됨.
+    // 상대 path 의 기준은 main/APINewServer 폴더를 기준으로 함.
+    baseDir: ".",
+  }, // 기본 로깅 설정
+
+  // configServer 설정
+  http: {
+    configServer: {
+      url: "http://127.0.0.1:10100",
+    },
+  },
+}

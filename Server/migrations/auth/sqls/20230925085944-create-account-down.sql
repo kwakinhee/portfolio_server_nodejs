@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS account;
+DROP TABLE IF EXISTS pub_id;
+DROP TABLE IF EXISTS server_group_user;

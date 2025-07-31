@@ -1,0 +1,24 @@
+{
+  "user": {
+    "host": "localhost",
+    "port": 3306,
+    "user": "inheedev_test",
+    "password": "inheedev123$",
+    "driver": "mysql",
+    "multipleStatements": true,
+    "supportBigNumbers": true,
+    "bigNumberStrings": true,
+    "database": "inheeuser_00"
+  },
+  "auth": {
+    "host": "localhost",
+    "port": 3306,
+    "user": "inheedev_test",
+    "password": "inheedev123$",
+    "driver": "mysql",
+    "multipleStatements": true,
+    "supportBigNumbers": true,
+    "bigNumberStrings": true,
+    "database": "inheeauth"
+  }
+}

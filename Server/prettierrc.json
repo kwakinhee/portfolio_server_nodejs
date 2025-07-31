@@ -1,0 +1,11 @@
+{
+  "singleQuote": true,     // 'string' 사용 여부
+  "semi": true,            // ; 사용 여부
+  "useTabs": true,         // tab 사용 여부
+  "tabWidth": 10,          // tab의 너비
+  "trailingComma": "all",  // 끝에 , 사용 여부
+  "printWidth": 100,       // 한 줄의 라인 수
+  "bracketSpacing": true,  // Object literal에 띄어쓰기 사용 여부 (ex: { foo: bar })
+  "arrowParens": "always", // 함수에서 인자에 괄호 사용 여부 (ex: (x) => y)
+  "endOfLine": "lf"        // 라인 엔딩 지정
+}

@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+message C2ASProtocol
+{
+  enum PacketType {
+    NONE = 0;
+  
+    LoginReq = 1000;
+    GetWorldServerAddressReq = 1001;
+  
+    Pong = 3001;
+    
+    MAX = 32767;
+  }
+  
+  // Client -> Server Request
+  message Message
+  {
+    message LoginReq
+    {
+      string accountId = 1; // Dev 환경인 경우 로그인 창에서 입력하는 아이디, Prod 환경인 경우 다른 외부에서 생성된 Unique한 AccountId.
+      string clientVersion = 2; // 클라이언트 앱 버전 (빌드 버전).
+      string loginPlatform = 3; // 구글, 페이스북, None 소셜 플랫폼.
+    }
+  
+    message GetWorldServerAddressReq
+    {
+    }
+    
+    message Ping
+    {
+      optional bool serverTimeUtcRequest = 1;
+      optional int64 clientTimeUtc = 2;
+      optional string stressMessage = 3;
+    }
+  }
+}

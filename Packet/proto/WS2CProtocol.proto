@@ -1,0 +1,274 @@
+syntax = "proto3";
+
+import "Common.proto";
+
+message WS2CProtocol
+{
+  enum PacketType {
+    NONE = 0;
+  
+    LoginRes = 1001;
+    MoveRes = 1002;
+    LogoutRes = 1003;
+    JoinWorldRes = 1004;
+    FullSyncWorldRes = 1005;
+    GetWorldAddressRes = 1006;
+    LoadAvatarSlotRes = 1007;
+    ChangeAvatarSlotRes = 1008;
+    GetMyProfileRes = 1009;
+    ActionRes = 1010;
+    FieldObjectListRes = 1011;
+    SetFieldObjectRes = 1012;
+    UpdateFieldObjectRes = 1013;
+    RemoveFieldObjectRes = 1014;
+
+    KickNoti = 2001;
+    UserJoinBroadcastNoti = 2002;
+    UserLeaveBroadcastNoti = 2003;
+    WorldInfoNoti = 2004;
+
+    Pong = 3001;
+    ServerError = 3002;
+    ServerNotice = 3003;
+    RefreshEnterWorldTokenNoti = 3004;
+    
+    GetMyBagRes = 4001;
+    EquipRes = 4002;
+    UnequipRes = 4003;
+
+    MAX = 32767;
+  }
+  
+  message Message
+  {
+    enum ENoticeMessageType
+    {
+      GENERAL = 0;
+      URGENT = 1;
+      WARNING = 2;
+    }
+  
+    message LoginRes
+    {
+      bool result = 1;
+      int64 loginTimeUtc = 2;
+      int32 userCount = 3; // 유저 동접.
+      Common.UserEntity user = 4;
+      Common.CharacterEntity character = 5;
+    }
+  
+    message KickNoti
+    {
+      int32 kickType = 1;
+    }
+  
+    message MoveRes
+    {
+      int32 userId = 1;
+      Common.MoveStateEntity moveState = 2;
+    }
+  
+    message LogoutRes
+    {
+      int32 userId = 1;  // 로그 아웃된 userId.
+      int32 userCount = 2; // 유저 동접.
+    }
+  
+    message WorldAddressRes
+    {
+      bool result = 1;
+      string serverAddress = 2;
+      int32 worldId = 3;
+    }
+  
+    message JoinWorldRes
+    {
+      bool result = 1;
+      int32 userId = 2;
+      int32 worldId = 3;
+    }
+
+    message UserDataEntity
+    {
+      int32 userId = 1;
+      Common.CharacterEntity character = 2;
+    }
+  
+    message NetworkEntity
+    {
+      int32 objectId = 1;
+    }
+  
+    message FullSyncWorldRes
+    {
+      int32 worldId = 1;
+      int32 time = 2;
+      repeated UserDataEntity worldUserList = 3;
+      repeated NetworkEntity NetworkEntityList = 4;
+    }
+  
+    message ActionRes
+    {
+      int32 userId = 1;
+      bytes byte_arr_message = 2;
+    }
+  
+    // 룸 조인시 유저 동기화
+    message UserJoinBroadcastNoti
+    {
+      int32 userId = 1;
+      Common.CharacterEntity character = 2;
+    }
+  
+    message UserLeaveBroadcastNoti
+    {
+      string CharacterName = 1;
+      int32 userId = 2;
+    }
+  
+    message AvatarSlotRes
+    {
+      repeated Common.AvaterSlotEntity avaterSlots = 1;
+    }
+  
+    message ChangeAvatarSlotRes
+    {
+      bool result = 1;
+    }
+  
+    message MyProfileRes
+    {
+      int32 userId = 1;
+      string accountId = 2;
+      int32 isAdmin = 3;
+      int32 characterCmsId = 4;
+    }
+  
+    message PickupItemRes
+    {
+      // z 는 층 x,y는 오브젝트 인덱스
+      int32 x = 1;
+      int32 y = 2;
+      int32 z = 3;
+      int32 objectCmsId = 4;
+      int32 itemCmsId = 5;
+    }
+  
+    message ThowAwayItemRes
+    {
+      // z 는 층 x,y는 오브젝트 인덱스
+      int32 x = 1;
+      int32 y = 2;
+      int32 z = 3;
+      int32 objectType = 4;
+      int32 objectCmsId = 5;
+    }
+  
+    message TileEntity
+    {
+      int32 tileId = 1;
+      int32 posX = 2;
+      int32 posY = 3;
+      int32 layer = 4;
+    }
+  
+    message FieldObjectEntity
+    {
+      int32 objectDbId = 1;
+      int32 objectCmsId = 2;
+      int32 posX = 3;
+      int32 posY = 4;
+      int32 layer = 5;
+      int32 dir = 6;
+    }
+
+    message InventoryItem
+    {
+      message ToolAttributes
+      {
+        int32 durability = 1;
+      }
+
+      message VegetationAttributes
+      {
+        int32 durability = 1;
+      }
+
+      int64 itemDbGuid = 1;  //required
+      int32 itemCmsId = 2;    //required
+      int32 count = 3;        //required
+
+      ToolAttributes toolAttr = 6;                //optional! 개별속성이 존재할 시 CMSTable에서 어떤 개별속성을 가져와야하는지 미리 정의.
+      VegetationAttributes vegetationAttr = 7;    //optional! 개별속성이 존재할 시 CMSTable에서 어떤 개별속성을 가져와야하는지 미리 정의.
+    }
+  
+    message TileListNoti
+    {
+      repeated TileEntity tileList = 1;
+    }
+  
+    message WorldInfoNoti
+    {
+      int32 worldDbId = 1;
+      repeated TileEntity tileList = 2;
+      repeated FieldObjectEntity fieldObjectList = 3;
+    }
+  
+    message FieldObjectListNoti
+    {
+      repeated FieldObjectEntity fieldObjectList = 1;
+    }
+  
+    message SetFieldObjectRes
+    {
+      int32 errorCode = 1;
+      int32 userId = 2;
+      FieldObjectEntity objectData = 3;
+    }
+  
+    message UpdateFieldObjectRes
+    {
+      int32 errorCode = 1;
+      int32 userId = 2;
+      FieldObjectEntity objectData = 3;
+    }
+  
+    message RemoveFieldObjectRes
+    {
+      int32 errorCode = 1;
+      int32 userId = 2;
+      int32 objectId = 3;
+    }
+
+    message GetMyBagRes
+    {
+      int32 errorCode = 1; //required
+      int32 bagCapacity = 2; //required
+      repeated InventoryItem itemList = 3; //required
+    }
+  
+    message Pong
+    {
+      optional int64 serverTimeUtc = 1;
+      optional string stressMessage = 2;
+    }
+  
+    message ServerError
+    {
+      int32 errCode = 1;
+      optional string errMessage = 2;
+      PacketType failedCQPacket = 3;
+    }
+  
+    message ServerNotice
+    {
+      ENoticeMessageType messagetype = 1;
+      string content = 2;
+    }
+  
+    message RefreshEnterWorldTokenNoti
+    {
+      string enterWorldToken = 1;
+    } 
+  }
+}

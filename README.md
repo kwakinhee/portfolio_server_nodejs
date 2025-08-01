@@ -37,13 +37,9 @@ flowchart TD
     configServer -->|REST API| worldMgrServer
 ```
 
-> 아키텍처는 실시간 유저 인증과 접속 분산, 설정 전파, Redis 캐시 및 Pub/Sub을 통한 메시징 구조로 설계되어 있습니다.
+> 아키텍처는 실시간 유저 인증, 서버 스케일아웃 가능한 설정 아키텍쳐, 설정 전파,  DB 샤딩 및 마이그레이션, Redis 캐시 및 Pub/Sub을 통한 메시징 구조 등으로 설계되어 있습니다.
 
 
 ## 📎 참고
-
-- 개발자는 실무 12년차 MO, 비동기MMO, 등의 게임 서버 아키텍처 및 
-  성능 테스트 경험 보유 
-  (추후 ELK, Prometheus & Grafana api 연동 및 대쉬보드 구현)
-- 클라우드(AWS) 인프라 및 배포 자동화까지 구현된 End-to-End 프로젝트
+> 실제 NodeJS Typescript 기반 서버로 '대항해시대 오리진 (MMORPG)', '이말년과 침착한녀석들'(MORPG), '자이언트스텝 HIVE ADOR, Kampers' 초기 프로토타입 서버에 참고 및 적용 하였습니다.
 - 서버 상세 설명은 [`Server/README.md`](./Server/README.md) 참고
